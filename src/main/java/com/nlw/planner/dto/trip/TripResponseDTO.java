@@ -1,4 +1,4 @@
-package com.nlw.planner.dto;
+package com.nlw.planner.dto.trip;
 
 import java.util.UUID;
 

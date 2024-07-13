@@ -1,6 +1,6 @@
 package com.nlw.planner.model;
 
-import com.nlw.planner.dto.TripRequestDTO;
+import com.nlw.planner.dto.trip.TripRequestDTO;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

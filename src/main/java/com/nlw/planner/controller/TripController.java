@@ -1,7 +1,11 @@
 package com.nlw.planner.controller;
 
-import com.nlw.planner.dto.TripRequestDTO;
-import com.nlw.planner.dto.TripResponseDTO;
+import com.nlw.planner.dto.participants.ParticipantCreateDTO;
+import com.nlw.planner.dto.participants.ParticipantDataDTO;
+import com.nlw.planner.dto.participants.ParticipantsRequestDTO;
+import com.nlw.planner.dto.trip.TripRequestDTO;
+import com.nlw.planner.dto.trip.TripResponseDTO;
+import com.nlw.planner.model.Participant;
 import com.nlw.planner.model.Trip;
 import com.nlw.planner.repositories.TripRepository;
 import com.nlw.planner.service.ParticipantService;
@@ -11,6 +15,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -46,13 +52,42 @@ public class TripController {
         return ResponseEntity.notFound().build();
     }
 
+    @GetMapping("/{id}/participants")
+    public ResponseEntity<List<ParticipantDataDTO>> getAllParticipants(@PathVariable UUID id){
+        List<ParticipantDataDTO> participantList = this.participantService.getAllParticipantsFromEvent(id);
+
+        return ResponseEntity.ok(participantList);
+    }
+
     @PostMapping
     public ResponseEntity<TripResponseDTO> createTrip(@RequestBody TripRequestDTO tripRequestDTO) {
-        Trip trip = new Trip(tripRequestDTO);
+        Trip newTrip = new Trip(tripRequestDTO);
 
-        this.tripRepository.save(trip);
-        this.participantService.registerParticipants(tripRequestDTO.emails_to_invite(), trip.getId());
-        return ResponseEntity.ok(new TripResponseDTO(trip.getId()));
+        this.tripRepository.save(newTrip);
+        this.participantService.registerParticipants(
+                tripRequestDTO.emails_to_invite(),
+                newTrip);
+
+        return ResponseEntity.ok(new TripResponseDTO(newTrip.getId()));
+    }
+
+    @PostMapping("/{id}/invite")
+    public ResponseEntity<ParticipantCreateDTO> inviteParticipant(@PathVariable UUID id,
+                                                                  @RequestBody ParticipantsRequestDTO participantsDTO){
+        Optional<Trip> trip = tripRepository.findById(id);
+
+        if (trip.isPresent()){
+            Trip newTrip = trip.get();
+
+            ParticipantCreateDTO participantCreateDTO =
+                    this.participantService.registerParticipantToEvent(participantsDTO.email(),
+                                                                       newTrip);
+
+            if (newTrip.isConfirmed()) this.participantService.triggerConfirmationEmailToParticipant(participantsDTO.email());
+
+            return ResponseEntity.ok(participantCreateDTO);
+        }
+        return ResponseEntity.notFound().build();
     }
 
     @PutMapping("/{id}")

@@ -3,6 +3,9 @@ package com.nlw.planner.controller;
 import com.nlw.planner.dto.activity.ActivityDataDTO;
 import com.nlw.planner.dto.activity.ActivityRequestDTO;
 import com.nlw.planner.dto.activity.ActivityResponseDTO;
+import com.nlw.planner.dto.link.LinkDataDTO;
+import com.nlw.planner.dto.link.LinkRequestDTO;
+import com.nlw.planner.dto.link.LinkResponseDTO;
 import com.nlw.planner.dto.participants.ParticipantCreateDTO;
 import com.nlw.planner.dto.participants.ParticipantDataDTO;
 import com.nlw.planner.dto.participants.ParticipantsRequestDTO;
@@ -13,6 +16,7 @@ import com.nlw.planner.model.Trip;
 import com.nlw.planner.repositories.ActivityRepository;
 import com.nlw.planner.repositories.TripRepository;
 import com.nlw.planner.service.ActivityService;
+import com.nlw.planner.service.LinkService;
 import com.nlw.planner.service.ParticipantService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -37,6 +41,10 @@ public class TripController {
     @Autowired
     private ActivityService activityService;
 
+    @Autowired
+    private LinkService linkService;
+
+    // BUSCAR VIAGEM
     @GetMapping("/{id}")
     public ResponseEntity<Trip> findById(@PathVariable UUID id) {
         Optional<Trip> trip = tripRepository.findById(id);
@@ -60,41 +68,6 @@ public class TripController {
         return ResponseEntity.notFound().build();
     }
 
-
-    // BUSCAR TODOS PARTICIPANTES
-    @GetMapping("/{id}/participants")
-    public ResponseEntity<List<ParticipantDataDTO>> getAllParticipants(@PathVariable UUID id){
-        List<ParticipantDataDTO> participantList = this.participantService.getAllParticipantsFromEvent(id);
-
-        return ResponseEntity.ok(participantList);
-    }
-
-    @GetMapping("/{id}/activities")
-    public ResponseEntity<List<ActivityDataDTO>> getAllActivities(@PathVariable UUID id){
-        List<ActivityDataDTO> activityDataDTOS = this.activityService.getAllActivitiesFromEvent(id);
-
-        return ResponseEntity.ok(activityDataDTOS);
-    }
-
-    // CADASTRO DE ATIVIDADES
-    @PostMapping("/{id}/activities")
-    public ResponseEntity<ActivityResponseDTO> registerActivity(@PathVariable UUID id,
-                                           @RequestBody ActivityRequestDTO activityRequestDTO){
-        Optional<Trip> trip = tripRepository.findById(id);
-
-        if (trip.isPresent()){
-             Trip newTrip = trip.get();
-
-            ActivityResponseDTO activityResponseDTO = activityService.registerActivity(activityRequestDTO,
-                    newTrip);
-
-            return ResponseEntity.ok(activityResponseDTO);
-        }
-
-        return ResponseEntity.notFound().build();
-    }
-
-
     // CRIAR VIAGEM
     @PostMapping
     public ResponseEntity<TripResponseDTO> createTrip(@RequestBody TripRequestDTO tripRequestDTO) {
@@ -108,27 +81,7 @@ public class TripController {
         return ResponseEntity.ok(new TripResponseDTO(newTrip.getId()));
     }
 
-
-    // CONVIDAR PARTICIPANTE
-    @PostMapping("/{id}/invite")
-    public ResponseEntity<ParticipantCreateDTO> inviteParticipant(@PathVariable UUID id,
-                                                                  @RequestBody ParticipantsRequestDTO participantsDTO){
-        Optional<Trip> trip = tripRepository.findById(id);
-
-        if (trip.isPresent()){
-            Trip newTrip = trip.get();
-
-            ParticipantCreateDTO participantCreateDTO =
-                    this.participantService.registerParticipantToEvent(participantsDTO.email(),
-                                                                       newTrip);
-
-            if (newTrip.isConfirmed()) this.participantService.triggerConfirmationEmailToParticipant(participantsDTO.email());
-
-            return ResponseEntity.ok(participantCreateDTO);
-        }
-        return ResponseEntity.notFound().build();
-    }
-
+    // ATUALIZAR VIAGEM
     @PutMapping("/{id}")
     public ResponseEntity<Trip> updateTrip(@PathVariable UUID id,
                                            @RequestBody TripRequestDTO tripDTO) {
@@ -147,4 +100,86 @@ public class TripController {
 
         return ResponseEntity.notFound().build();
     }
+
+
+    // BUSCAR TODOS PARTICIPANTES
+    @GetMapping("/{id}/participants")
+    public ResponseEntity<List<ParticipantDataDTO>> getAllParticipants(@PathVariable UUID id){
+        List<ParticipantDataDTO> participantList = this.participantService.getAllParticipantsFromEvent(id);
+
+        return ResponseEntity.ok(participantList);
+    }
+
+
+    // CONVIDAR PARTICIPANTE
+    @PostMapping("/{id}/invite")
+    public ResponseEntity<ParticipantCreateDTO> inviteParticipant(@PathVariable UUID id,
+                                                                  @RequestBody ParticipantsRequestDTO participantsDTO){
+        Optional<Trip> trip = tripRepository.findById(id);
+
+        if (trip.isPresent()){
+            Trip newTrip = trip.get();
+
+            ParticipantCreateDTO participantCreateDTO =
+                    this.participantService.registerParticipantToEvent(participantsDTO.email(),
+                            newTrip);
+
+            if (newTrip.isConfirmed()) this.participantService.triggerConfirmationEmailToParticipant(participantsDTO.email());
+
+            return ResponseEntity.ok(participantCreateDTO);
+        }
+        return ResponseEntity.notFound().build();
+    }
+
+    // BUSCAR TODAS ATIVIDADES
+    @GetMapping("/{id}/activities")
+    public ResponseEntity<List<ActivityDataDTO>> getAllActivities(@PathVariable UUID id){
+        List<ActivityDataDTO> activityDataDTOS = this.activityService.getAllActivitiesFromEvent(id);
+
+        return ResponseEntity.ok(activityDataDTOS);
+    }
+
+    // CADASTRO DE ATIVIDADES
+    @PostMapping("/{id}/activities")
+    public ResponseEntity<ActivityResponseDTO> registerActivity(@PathVariable UUID id,
+                                                                @RequestBody ActivityRequestDTO activityRequestDTO){
+        Optional<Trip> trip = tripRepository.findById(id);
+
+        if (trip.isPresent()){
+            Trip newTrip = trip.get();
+
+            ActivityResponseDTO activityResponseDTO = activityService.registerActivity(activityRequestDTO,
+                    newTrip);
+
+            return ResponseEntity.ok(activityResponseDTO);
+        }
+
+        return ResponseEntity.notFound().build();
+    }
+
+
+    // BUSCAR LINKS
+    @GetMapping("/{id}/links")
+    public ResponseEntity<List<LinkDataDTO>> getAllLinks(@PathVariable UUID id){
+        List<LinkDataDTO> linkDataDTOS = this.linkService.getAllLinksFromEvent(id);
+
+        return ResponseEntity.ok(linkDataDTOS);
+    }
+
+    // CRIAR LINK
+    @PostMapping("/{id}/links")
+    public ResponseEntity<LinkResponseDTO> createLink(@PathVariable UUID id,
+                                                      @RequestBody LinkRequestDTO linkRequestDTO){
+        Optional<Trip> trip = tripRepository.findById(id);
+
+        if (trip.isPresent()){
+            Trip newTrip = trip.get();
+
+            LinkResponseDTO linkResponseDTO = linkService.registerLink(linkRequestDTO, newTrip);
+            return ResponseEntity.ok(linkResponseDTO);
+        }
+        return ResponseEntity.notFound().build();
+    }
+
+
 }

@@ -1,13 +1,18 @@
 package com.nlw.planner.controller;
 
+import com.nlw.planner.dto.activity.ActivityDataDTO;
+import com.nlw.planner.dto.activity.ActivityRequestDTO;
+import com.nlw.planner.dto.activity.ActivityResponseDTO;
 import com.nlw.planner.dto.participants.ParticipantCreateDTO;
 import com.nlw.planner.dto.participants.ParticipantDataDTO;
 import com.nlw.planner.dto.participants.ParticipantsRequestDTO;
 import com.nlw.planner.dto.trip.TripRequestDTO;
 import com.nlw.planner.dto.trip.TripResponseDTO;
-import com.nlw.planner.model.Participant;
+import com.nlw.planner.model.Activity;
 import com.nlw.planner.model.Trip;
+import com.nlw.planner.repositories.ActivityRepository;
 import com.nlw.planner.repositories.TripRepository;
+import com.nlw.planner.service.ActivityService;
 import com.nlw.planner.service.ParticipantService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -15,7 +20,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -30,12 +34,16 @@ public class TripController {
     @Autowired
     private ParticipantService participantService;
 
+    @Autowired
+    private ActivityService activityService;
+
     @GetMapping("/{id}")
     public ResponseEntity<Trip> findById(@PathVariable UUID id) {
         Optional<Trip> trip = tripRepository.findById(id);
         return trip.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
+    // PARTICIPANTE CONFIRMAR VIAGEM
     @GetMapping("/{id}/confirm")
     public ResponseEntity<Trip> confirmTrip(@PathVariable UUID id) {
         Optional<Trip> trip = tripRepository.findById(id);
@@ -52,6 +60,8 @@ public class TripController {
         return ResponseEntity.notFound().build();
     }
 
+
+    // BUSCAR TODOS PARTICIPANTES
     @GetMapping("/{id}/participants")
     public ResponseEntity<List<ParticipantDataDTO>> getAllParticipants(@PathVariable UUID id){
         List<ParticipantDataDTO> participantList = this.participantService.getAllParticipantsFromEvent(id);
@@ -59,6 +69,33 @@ public class TripController {
         return ResponseEntity.ok(participantList);
     }
 
+    @GetMapping("/{id}/activities")
+    public ResponseEntity<List<ActivityDataDTO>> getAllActivities(@PathVariable UUID id){
+        List<ActivityDataDTO> activityDataDTOS = this.activityService.getAllActivitiesFromEvent(id);
+
+        return ResponseEntity.ok(activityDataDTOS);
+    }
+
+    // CADASTRO DE ATIVIDADES
+    @PostMapping("/{id}/activities")
+    public ResponseEntity<ActivityResponseDTO> registerActivity(@PathVariable UUID id,
+                                           @RequestBody ActivityRequestDTO activityRequestDTO){
+        Optional<Trip> trip = tripRepository.findById(id);
+
+        if (trip.isPresent()){
+             Trip newTrip = trip.get();
+
+            ActivityResponseDTO activityResponseDTO = activityService.registerActivity(activityRequestDTO,
+                    newTrip);
+
+            return ResponseEntity.ok(activityResponseDTO);
+        }
+
+        return ResponseEntity.notFound().build();
+    }
+
+
+    // CRIAR VIAGEM
     @PostMapping
     public ResponseEntity<TripResponseDTO> createTrip(@RequestBody TripRequestDTO tripRequestDTO) {
         Trip newTrip = new Trip(tripRequestDTO);
@@ -71,6 +108,8 @@ public class TripController {
         return ResponseEntity.ok(new TripResponseDTO(newTrip.getId()));
     }
 
+
+    // CONVIDAR PARTICIPANTE
     @PostMapping("/{id}/invite")
     public ResponseEntity<ParticipantCreateDTO> inviteParticipant(@PathVariable UUID id,
                                                                   @RequestBody ParticipantsRequestDTO participantsDTO){

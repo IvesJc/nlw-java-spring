@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.UUID;
 
 @Repository
-public interface TripRepository extends JpaRepository<Trip, UUID> {
+public interface ActivityRepository extends JpaRepository<Activity, UUID> {
 
+    List<Activity> findByTripId(UUID id);
 }

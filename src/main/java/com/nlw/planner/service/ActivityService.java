@@ -6,10 +6,13 @@ import com.nlw.planner.dto.activity.ActivityResponseDTO;
 import com.nlw.planner.model.Activity;
 import com.nlw.planner.model.Trip;
 import com.nlw.planner.repositories.ActivityRepository;
+import com.nlw.planner.repositories.TripRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -18,12 +21,26 @@ public class ActivityService {
     @Autowired
     private ActivityRepository activityRepository;
 
-    public ActivityResponseDTO registerActivity(ActivityRequestDTO activityRequestDTO,
-                                                Trip trip){
-        Activity newActivity = new Activity(activityRequestDTO.title(),activityRequestDTO.occursAt(), trip);
+    @Autowired
+    private TripRepository tripRepository;
 
-        this.activityRepository.save(newActivity);
-        return new ActivityResponseDTO(newActivity.getId());
+    public ActivityResponseDTO registerActivity(ActivityRequestDTO activityRequestDTO,
+                                                UUID id
+    ) {
+        Optional<Trip> optionalTrip = tripRepository.findById(id);
+
+        if (optionalTrip.isPresent()) {
+            Trip newTrip = optionalTrip.get();
+
+            Activity newActivity = new Activity(
+                    activityRequestDTO.title(),
+                    activityRequestDTO.occursAt(),
+                    newTrip);
+
+            this.activityRepository.save(newActivity);
+            return new ActivityResponseDTO(newActivity.getId());
+        }
+        throw new RuntimeException();
     }
 
     public List<ActivityDataDTO> getAllActivitiesFromEvent(UUID id) {

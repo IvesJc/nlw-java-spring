@@ -2,13 +2,17 @@ package com.nlw.planner.service;
 
 import com.nlw.planner.dto.participants.ParticipantCreateDTO;
 import com.nlw.planner.dto.participants.ParticipantDataDTO;
+import com.nlw.planner.dto.participants.ParticipantsRequestDTO;
 import com.nlw.planner.model.Participant;
 import com.nlw.planner.model.Trip;
 import com.nlw.planner.repositories.ParticipantRepository;
+import com.nlw.planner.repositories.TripRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -17,6 +21,9 @@ public class ParticipantService {
     @Autowired
     private ParticipantRepository participantRepository;
 
+    @Autowired
+    private TripRepository tripRepository;
+
     public void registerParticipants(List<String> participantsToInvite, Trip trip){
         List<Participant> participantList = participantsToInvite.stream().map(email -> new Participant(email,
                 trip)).toList();
@@ -24,6 +31,24 @@ public class ParticipantService {
         this.participantRepository.saveAll(participantList);
         System.out.println(participantList.getFirst().getId());
     }
+
+    public ParticipantCreateDTO inviteParticipants(UUID id, ParticipantsRequestDTO participantsRequestDTO) {
+        Optional<Trip> trip = tripRepository.findById(id);
+
+        if (trip.isPresent()) {
+            Trip newTrip = trip.get();
+
+            ParticipantCreateDTO participantCreateDTO =
+                    this.registerParticipantToEvent(participantsRequestDTO.email(),
+                            newTrip);
+
+            if (newTrip.isConfirmed())
+                this.triggerConfirmationEmailToParticipant(participantsRequestDTO.email());
+            return participantCreateDTO;
+        }
+        throw new RuntimeException();
+    }
+
 
     public ParticipantCreateDTO registerParticipantToEvent(String email, Trip trip){
         Participant newParticipant = new Participant(email, trip);

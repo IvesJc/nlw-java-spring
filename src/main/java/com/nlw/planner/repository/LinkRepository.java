@@ -1,4 +1,4 @@
-package com.nlw.planner.repositories;
+package com.nlw.planner.repository;
 
 import com.nlw.planner.model.Link;
 import org.springframework.data.jpa.repository.JpaRepository;

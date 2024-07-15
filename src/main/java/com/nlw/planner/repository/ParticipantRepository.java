@@ -1,4 +1,4 @@
-package com.nlw.planner.repositories;
+package com.nlw.planner.repository;
 
 import com.nlw.planner.model.Participant;
 import org.springframework.data.jpa.repository.JpaRepository;

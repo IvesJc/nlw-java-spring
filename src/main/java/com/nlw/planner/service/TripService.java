@@ -1,12 +1,10 @@
 package com.nlw.planner.service;
 
-import com.nlw.planner.dto.trip.TripDTO;
 import com.nlw.planner.dto.trip.TripRequestDTO;
-import com.nlw.planner.dto.trip.TripResponseDTO;
 import com.nlw.planner.model.Trip;
-import com.nlw.planner.repositories.TripRepository;
+import com.nlw.planner.repository.TripRepository;
+import com.nlw.planner.service.exception.EndDateBeforeStartDateException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -45,6 +43,10 @@ public class TripService {
 
     public Trip createTrip(TripRequestDTO tripRequestDTO){
         Trip newTrip = new Trip(tripRequestDTO);
+
+        if (newTrip.getEndsAt().isBefore(newTrip.getStartsAt())){
+            throw new EndDateBeforeStartDateException("End date must be after start date!");
+        }
 
         this.tripRepository.save(newTrip);
         this.participantService.registerParticipants(

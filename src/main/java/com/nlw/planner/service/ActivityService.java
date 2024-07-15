@@ -5,10 +5,9 @@ import com.nlw.planner.dto.activity.ActivityRequestDTO;
 import com.nlw.planner.dto.activity.ActivityResponseDTO;
 import com.nlw.planner.model.Activity;
 import com.nlw.planner.model.Trip;
-import com.nlw.planner.repositories.ActivityRepository;
-import com.nlw.planner.repositories.TripRepository;
+import com.nlw.planner.repository.ActivityRepository;
+import com.nlw.planner.repository.TripRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -36,6 +35,7 @@ public class ActivityService {
                     activityRequestDTO.title(),
                     activityRequestDTO.occursAt(),
                     newTrip);
+
 
             this.activityRepository.save(newActivity);
             return new ActivityResponseDTO(newActivity.getId());

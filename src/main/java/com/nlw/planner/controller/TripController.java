@@ -9,13 +9,9 @@ import com.nlw.planner.dto.link.LinkResponseDTO;
 import com.nlw.planner.dto.participants.ParticipantCreateDTO;
 import com.nlw.planner.dto.participants.ParticipantDataDTO;
 import com.nlw.planner.dto.participants.ParticipantsRequestDTO;
-import com.nlw.planner.dto.trip.TripDTO;
 import com.nlw.planner.dto.trip.TripRequestDTO;
 import com.nlw.planner.dto.trip.TripResponseDTO;
-import com.nlw.planner.model.Activity;
 import com.nlw.planner.model.Trip;
-import com.nlw.planner.repositories.ActivityRepository;
-import com.nlw.planner.repositories.TripRepository;
 import com.nlw.planner.service.ActivityService;
 import com.nlw.planner.service.LinkService;
 import com.nlw.planner.service.ParticipantService;
@@ -24,10 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 @RestController

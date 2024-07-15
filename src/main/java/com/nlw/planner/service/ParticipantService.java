@@ -5,10 +5,9 @@ import com.nlw.planner.dto.participants.ParticipantDataDTO;
 import com.nlw.planner.dto.participants.ParticipantsRequestDTO;
 import com.nlw.planner.model.Participant;
 import com.nlw.planner.model.Trip;
-import com.nlw.planner.repositories.ParticipantRepository;
-import com.nlw.planner.repositories.TripRepository;
+import com.nlw.planner.repository.ParticipantRepository;
+import com.nlw.planner.repository.TripRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

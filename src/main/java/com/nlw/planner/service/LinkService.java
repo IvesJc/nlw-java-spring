@@ -5,10 +5,9 @@ import com.nlw.planner.dto.link.LinkRequestDTO;
 import com.nlw.planner.dto.link.LinkResponseDTO;
 import com.nlw.planner.model.Link;
 import com.nlw.planner.model.Trip;
-import com.nlw.planner.repositories.LinkRepository;
-import com.nlw.planner.repositories.TripRepository;
+import com.nlw.planner.repository.LinkRepository;
+import com.nlw.planner.repository.TripRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

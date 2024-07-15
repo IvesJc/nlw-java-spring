@@ -1,7 +1,6 @@
-package com.nlw.planner.repositories;
+package com.nlw.planner.repository;
 
 import com.nlw.planner.model.Activity;
-import com.nlw.planner.model.Trip;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

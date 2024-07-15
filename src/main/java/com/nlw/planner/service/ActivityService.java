@@ -7,6 +7,7 @@ import com.nlw.planner.model.Activity;
 import com.nlw.planner.model.Trip;
 import com.nlw.planner.repository.ActivityRepository;
 import com.nlw.planner.repository.TripRepository;
+import com.nlw.planner.service.exception.ActivityDateNotInTripDateException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -36,11 +37,12 @@ public class ActivityService {
                     activityRequestDTO.occursAt(),
                     newTrip);
 
-
-            this.activityRepository.save(newActivity);
-            return new ActivityResponseDTO(newActivity.getId());
+            if (newActivity.getOccursAt().isAfter(newTrip.getStartsAt()) && newActivity.getOccursAt().isBefore(newTrip.getEndsAt())) {
+                this.activityRepository.save(newActivity);
+                return new ActivityResponseDTO(newActivity.getId());
+            }
         }
-        throw new RuntimeException();
+        throw new ActivityDateNotInTripDateException("Activity date must be included between trip date!");
     }
 
     public List<ActivityDataDTO> getAllActivitiesFromEvent(UUID id) {

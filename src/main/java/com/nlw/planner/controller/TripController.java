@@ -118,7 +118,7 @@ public class TripController {
 
     // CRIAR LINK
     @PostMapping("/{id}/links")
-    public ResponseEntity<LinkResponseDTO> createLink(@PathVariable UUID id,
+    public ResponseEntity<LinkResponseDTO> registerLink(@PathVariable UUID id,
                                                       @RequestBody LinkRequestDTO linkRequestDTO) {
         LinkResponseDTO linkResponseDTO = linkService.registerLink(linkRequestDTO, id);
         return ResponseEntity.ok(linkResponseDTO);

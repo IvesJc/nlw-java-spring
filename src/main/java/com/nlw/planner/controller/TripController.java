@@ -46,6 +46,7 @@ public class TripController {
         return ResponseEntity.ok(trip);
     }
 
+
     // PARTICIPANTE CONFIRMAR VIAGEM
     @GetMapping("/{id}/confirm")
     public ResponseEntity<Trip> confirmTrip(@PathVariable UUID id) {
@@ -119,7 +120,7 @@ public class TripController {
     // CRIAR LINK
     @PostMapping("/{id}/links")
     public ResponseEntity<LinkResponseDTO> registerLink(@PathVariable UUID id,
-                                                      @RequestBody LinkRequestDTO linkRequestDTO) {
+                                                        @RequestBody LinkRequestDTO linkRequestDTO) {
         LinkResponseDTO linkResponseDTO = linkService.registerLink(linkRequestDTO, id);
         return ResponseEntity.ok(linkResponseDTO);
     }

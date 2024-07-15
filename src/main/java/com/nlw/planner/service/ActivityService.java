@@ -53,7 +53,5 @@ public class ActivityService {
                         activity.getTitle(),
                         activity.getOccursAt())).
                 toList();
-
     }
-
 }

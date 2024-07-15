@@ -4,6 +4,7 @@ import com.nlw.planner.dto.trip.TripRequestDTO;
 import com.nlw.planner.model.Trip;
 import com.nlw.planner.repository.TripRepository;
 import com.nlw.planner.service.exception.EndDateBeforeStartDateException;
+import com.nlw.planner.service.exception.IdNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -23,9 +24,12 @@ public class TripService {
 
     public Trip findById(UUID id) {
         Optional<Trip> optionalTrip = tripRepository.findById(id);
-
-        return optionalTrip.orElseThrow(RuntimeException::new);
+        if (optionalTrip.isPresent()) {
+            return optionalTrip.get();
+        }
+        throw new IdNotFoundException();
     }
+
 
     public Trip confirmTrip(UUID id) {
         Optional<Trip> trip = tripRepository.findById(id);
@@ -38,13 +42,13 @@ public class TripService {
             this.participantService.triggerConfirmationEmailToParticipants(id);
             return newTrip;
         }
-        throw new RuntimeException();
+        throw new IdNotFoundException();
     }
 
-    public Trip createTrip(TripRequestDTO tripRequestDTO){
+    public Trip createTrip(TripRequestDTO tripRequestDTO) {
         Trip newTrip = new Trip(tripRequestDTO);
 
-        if (newTrip.getEndsAt().isBefore(newTrip.getStartsAt())){
+        if (newTrip.getEndsAt().isBefore(newTrip.getStartsAt())) {
             throw new EndDateBeforeStartDateException("End date must be after start date!");
         }
 
@@ -55,7 +59,7 @@ public class TripService {
         return newTrip;
     }
 
-    public Trip updateTrip(UUID id, TripRequestDTO tripDTO){
+    public Trip updateTrip(UUID id, TripRequestDTO tripDTO) {
         Optional<Trip> trip = tripRepository.findById(id);
 
         if (trip.isPresent()) {
@@ -68,6 +72,6 @@ public class TripService {
             this.tripRepository.save(newTrip);
             return newTrip;
         }
-        throw new RuntimeException();
+        throw new IdNotFoundException();
     }
 }

@@ -7,6 +7,7 @@ import com.nlw.planner.model.Link;
 import com.nlw.planner.model.Trip;
 import com.nlw.planner.repository.LinkRepository;
 import com.nlw.planner.repository.TripRepository;
+import com.nlw.planner.service.exception.IdNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -35,7 +36,7 @@ public class LinkService {
             this.linkRepository.save(newLink);
             return new LinkResponseDTO(newLink.getId());
         }
-        throw new RuntimeException();
+        throw new IdNotFoundException();
     }
 
     public List<LinkDataDTO> getAllLinksFromEvent(UUID id) {

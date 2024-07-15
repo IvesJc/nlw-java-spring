@@ -7,6 +7,7 @@ import com.nlw.planner.model.Participant;
 import com.nlw.planner.model.Trip;
 import com.nlw.planner.repository.ParticipantRepository;
 import com.nlw.planner.repository.TripRepository;
+import com.nlw.planner.service.exception.IdNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -45,7 +46,7 @@ public class ParticipantService {
                 this.triggerConfirmationEmailToParticipant(participantsRequestDTO.email());
             return participantCreateDTO;
         }
-        throw new RuntimeException();
+        throw new IdNotFoundException();
     }
 
 
